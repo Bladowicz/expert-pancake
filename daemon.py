@@ -5,14 +5,13 @@ import os
 import time
 import atexit
 from signal import SIGTERM
-from datetime import datetime
+import datetime
 import logging
 import subprocess
 import smtplib
 import traceback
 import src
 import glob
-from dateutil import relativedelta as rd
 
 class BashError(Exception):
     pass
@@ -195,8 +194,8 @@ class Teacher(Daemon):
         server.close()
 
     def get_files(self):
-        now = datetime.now()
-        then = now - rd.relativedelta(hours=self.time)
+        now = datetime.datetime.now()
+        then = now - datetime.timedelta(hours=self.time)
         result = []
         for f in glob.glob("/home/model/y/modelTester.log.*.gz"):
             d = datetime.strptime(os.path.basename(f), 'modelTester.log.%Y-%M-%d-%H.gz')

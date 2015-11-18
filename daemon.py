@@ -130,7 +130,7 @@ class Teacher(Daemon):
         self.epass = self.config.get("email", "pass")
         self.subject = self.config.get("email", "sub")
         self.recipents = self.config.get("email", "recipents")
-        self.time = self.config.get("main", "history_length")
+        self.time = self.config.getint("main", "history_length")
 
     def run(self):
         while 1:

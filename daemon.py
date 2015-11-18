@@ -172,7 +172,7 @@ class Teacher(Daemon):
 
     def _prepare_input(self):
         files = self.get_files()
-        os.chdir("/home/model/home/model/model-class-updater-1.0")
+        os.chdir("home/model/model-class-updater-1.0")
         command = '/bin/bash run.sh 1 self.input_file {}'.format(" ".join(files))
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         a, b = process.communicate()

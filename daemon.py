@@ -158,11 +158,14 @@ class Teacher(Daemon):
 
     def teachvw(self):
         self._prepare_input()
-        command = "vw {data_file} -f {output} {params}  --cache_file {cache_file}"
-        command = 'echo "{}"'.format(command.format(data_file=self.input_file,
+        command = "vw {data_file} -f {output} {params}  --cache_file {cache_file}".format(data_file=self.input_file,
                                                     output=self.out_file,
                                                     cache_file=self.cache_file,
-                                                    params=self.params))
+                                                    params=self.params)
+        # command = 'echo "{}"'.format(command.format(data_file=self.input_file,
+        #                                             output=self.out_file,
+        #                                             cache_file=self.cache_file,
+        #                                             params=self.params))
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         a, b = process.communicate()
         if process.returncode != 0:

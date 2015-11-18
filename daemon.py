@@ -12,6 +12,7 @@ import smtplib
 import traceback
 import src
 import glob
+from dateutil import relativedelta as rd
 
 class BashError(Exception):
     pass
@@ -130,6 +131,7 @@ class Teacher(Daemon):
         self.epass = self.config.get("email", "pass")
         self.subject = self.config.get("email", "sub")
         self.recipents = self.config.get("email", "recipents")
+        self.time = self.config.get("main", "history_length")
 
     def run(self):
         while 1:
@@ -194,7 +196,14 @@ class Teacher(Daemon):
 
     def get_files(self):
         now = datetime.now()
-        return glob.glob("/home/model/y/modelTester.log.*.gz")
+        then = now - rd.relativedelta(hours=self.time)
+        result = []
+        for f in glob.glob("/home/model/y/modelTester.log.*.gz"):
+            d = datetime.strptime(os.path.basename(f), 'modelTester.log.%Y-%M-%d-%H.gz')
+            if d > then and d < now:
+                result.append(f)
+        return result
+
 
 
 

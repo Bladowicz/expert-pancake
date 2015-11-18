@@ -203,9 +203,12 @@ class Teacher(Daemon):
     def get_files(self):
         now = datetime.datetime.now()
         then = now - datetime.timedelta(hours=self.time)
+        logging.info(str(now))
+        logging.info(str(then))
         result = []
         for f in glob.glob("/home/model/y/modelTester.log.*.gz"):
             d = datetime.datetime.strptime(os.path.basename(f), 'modelTester.log.%Y-%M-%d-%H.gz')
+            logging.info("a" + str(d))
             if d > then and d < now:
                 result.append(f)
         return result

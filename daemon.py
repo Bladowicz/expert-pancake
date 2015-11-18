@@ -129,7 +129,7 @@ class Teacher(Daemon):
         self.min_interval = self.config.getint('main', 'min_interval')
         self.sleep = self.config.getint('main', 'sleep_time')
         self.params = self.config.get("params", "params")
-        self.input_file = self.config.get("main", "input_file")
+        self.input_file = os.path.join("/tmp/", self.config.get("main", "input_file"))
         self.out_file = self.config.get("main", "out_file")
         self.cache_file = self.config.get("main", "cache_file")
         self.euser = self.config.get("email", "user")

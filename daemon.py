@@ -126,7 +126,7 @@ class Teacher(Daemon):
         self.cache_file = self.config.get("main", "cache_file")
         self.euser = self.config.get("email", "user")
         self.epass = self.config.get("email", "pass")
-        self.sub = self.config.get("email", "sub")
+        self.subject = self.config.get("email", "sub")
         self.recipents = self.config.get("email", "recipents")
 
     def run(self):

@@ -163,6 +163,7 @@ class Teacher(Daemon):
 
     def _prepare_input(self):
         files = self.get_files()
+        logging.info('\t'.join(files))
         # raise
         command = 'cp /home/gbaranowski/test_in {input_file}'.format(input_file=self.input_file)
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)

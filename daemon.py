@@ -208,7 +208,9 @@ class Teacher(Daemon):
         result = []
         for f in glob.glob("/home/model/y/modelTester.log.*.gz"):
             d = datetime.datetime.strptime(os.path.basename(f), 'modelTester.log.%Y-%M-%d-%H.gz')
-            logging.info("a" + str(d) + " " + str(d > then) + " " + str(d < now))
+            logging.info("\t".join(map(str, ["a1", d, type(d), type(now), now, d<now, d>now])))
+            logging.info("\t".join(map(str, ["a2", d, type(d), type(then), then, d<then, d>then])))
+
             if d > then and d < now:
                 result.append(f)
         if len(result) == 0:

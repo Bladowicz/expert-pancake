@@ -143,7 +143,7 @@ class Teacher(Daemon):
             time.sleep(self.sleep)
             if (datetime.datetime.now() - self.last_action).seconds > self.min_interval:
                 try:
-                    logging.info("Starting up " + str(self.last_action))
+                    logging.info("Starting up after " + str((datetime.datetime.now() - self.last_action).seconds ))
                     self.last_action = datetime.datetime.now()
                     self.teachvw()
                 except BashError as e:

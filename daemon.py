@@ -138,7 +138,7 @@ class Teacher(Daemon):
                     self.last_action = datetime.now()
                     self.teachvw()
                 except Exception as e:
-                    self.send_email('grzegorz.baranowski@adpilot.pl', 'VWTeacher', traceback.format_exc())
+                    self.send_email(traceback.format_exc())
 
     def restart(self, config):
         self.stop()

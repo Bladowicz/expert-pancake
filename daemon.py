@@ -175,7 +175,9 @@ class Teacher(Daemon):
         os.chdir("/home/model/model-class-updater-1.0")
         command = '/bin/bash run.sh 1 {} {}'.format(self.input_file, " ".join(files))
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        logging.info("a")
         a, b = process.communicate()
+        logging.info("b")
         if process.returncode != 0:
             raise(BashError(command, b.strip()))
         logging.info(a.strip())

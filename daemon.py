@@ -13,6 +13,8 @@ import traceback
 import src
 import glob
 
+class BashError(Exception):
+    pass
 
 class Daemon(object):
     def __init__(self, pidfile, stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
@@ -154,8 +156,8 @@ class Teacher(Daemon):
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         a, b = process.communicate()
         if process.returncode != 0:
-            logging.fatal(b)
-            sys.exit(1)
+            logging.fatal(b.strip())
+            raise(BashError)
         logging.info(a.strip())
         self._remove_input()
 
@@ -166,8 +168,8 @@ class Teacher(Daemon):
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         a, b = process.communicate()
         if process.returncode != 0:
-            logging.fatal(b)
-            sys.exit(1)
+            logging.fatal(b.strip())
+            raise(BashError)
         logging.info(a.strip())
 
     def _remove_input(self):

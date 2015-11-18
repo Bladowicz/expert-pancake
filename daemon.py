@@ -1,11 +1,18 @@
 #!/usr/bin/env python
 
-import sys, os, time, atexit
+import sys
+import os
+import time
+import atexit
 from signal import SIGTERM
-import src
 from datetime import datetime
 import logging
 import subprocess
+import smtplib
+import traceback
+import src
+import glob
+
 
 class Daemon(object):
     def __init__(self, pidfile, stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
@@ -104,25 +111,34 @@ class Daemon(object):
 
 
 class Teacher(Daemon):
-
     def start(self, config):
         self.config = config
-        self.min_interval = config.getint('main', 'min_interval')
-        self.sleep = config.getint('main', 'sleep_time')
-        self.params = config.get("params", "params")
-        self.input_file = config.get("main", "input_file")
-        self.out_file = config.get("main", "out_file")
-        self.cache_file = config.get("main", "cache_file")
+        self.consume_config()
         self.last_action = datetime.now()
         super(Teacher, self).start()
+
+    def consume_config(self):
+        self.min_interval = self.config.getint('main', 'min_interval')
+        self.sleep = self.config.getint('main', 'sleep_time')
+        self.params = self.config.get("params", "params")
+        self.input_file = self.config.get("main", "input_file")
+        self.out_file = self.config.get("main", "out_file")
+        self.cache_file = self.config.get("main", "cache_file")
+        self.euser = self.config.get("email", "user")
+        self.epass = self.config.get("email", "pass")
+        self.sub = self.config.get("email", "sub")
+        self.recipents = self.config.get("email", "recipents")
 
     def run(self):
         while 1:
             time.sleep(self.sleep)
             if (datetime.now() - self.last_action).seconds > self.min_interval:
-                self.last_action = datetime.now()
-                logging.info("ACTION " + str(self.last_action))
-                self.teachvw()
+                try:
+                    logging.info("Starting up " + str(self.last_action))
+                    self.last_action = datetime.now()
+                    self.teachvw()
+                except Exception as e:
+                    self.send_email('grzegorz.baranowski@adpilot.pl', 'VWTeacher', traceback.format_exc())
 
     def restart(self, config):
         self.stop()
@@ -131,11 +147,10 @@ class Teacher(Daemon):
     def teachvw(self):
         self._prepare_input()
         command = "vw {data_file} -f {output} {params}  --cache_file {cache_file}"
-        command = 'echo "{}"'.format(command.format(data_file = self.input_file,
+        command = 'echo "{}"'.format(command.format(data_file=self.input_file,
                                                     output=self.out_file,
                                                     cache_file=self.cache_file,
                                                     params=self.params))
-
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         a, b = process.communicate()
         if process.returncode != 0:
@@ -145,7 +160,9 @@ class Teacher(Daemon):
         self._remove_input()
 
     def _prepare_input(self):
-        command = 'cp /home/gbaranowski/test_in {input_file}'.format(input_file = self.input_file)
+        files = self.get_files()
+        raise
+        command = 'cp /home/gbaranowski/test_in {input_file}'.format(input_file=self.input_file)
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         a, b = process.communicate()
         if process.returncode != 0:
@@ -155,3 +172,26 @@ class Teacher(Daemon):
 
     def _remove_input(self):
         os.remove(self.input_file)
+
+    def send_email(self, body):
+        recipient = self.recipents.split(",")
+        FROM = self.euser
+        TO = recipient if type(recipient) is list else [recipient]
+        SUBJECT = self.subject
+        TEXT = body
+        # Prepare actual message
+        message = """\From: %s\nTo: %s\nSubject: %s\n\n%s
+        """ % (FROM, ", ".join(TO), SUBJECT, TEXT)
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.ehlo()
+        server.starttls()
+        server.login(self.euser, self.epass)
+        server.sendmail(FROM, TO, message)
+        server.close()
+
+    def get_files(self):
+        now = datetime.now()
+        return glob.glob("/home/model/y/modelTester.log.*.gz")
+
+
+

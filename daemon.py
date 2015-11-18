@@ -116,7 +116,7 @@ class Teacher(Daemon):
     def start(self, config):
         self.config = config
         self.consume_config()
-        self.last_action = datetime.now()
+        self.last_action = datetime.datetime.now()
         super(Teacher, self).start()
 
     def consume_config(self):
@@ -135,10 +135,10 @@ class Teacher(Daemon):
     def run(self):
         while 1:
             time.sleep(self.sleep)
-            if (datetime.now() - self.last_action).seconds > self.min_interval:
+            if (datetime.datetime.now() - self.last_action).seconds > self.min_interval:
                 try:
                     logging.info("Starting up " + str(self.last_action))
-                    self.last_action = datetime.now()
+                    self.last_action = datetime.datetime.now()
                     self.teachvw()
                 except Exception as e:
                     self.send_email(traceback.format_exc())

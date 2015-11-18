@@ -211,6 +211,8 @@ class Teacher(Daemon):
             logging.info("a" + str(d))
             if d > then and d < now:
                 result.append(f)
+        if len(result) == 0:
+            raise(BashError("Files", "None"))
         return result
 
 

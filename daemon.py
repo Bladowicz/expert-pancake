@@ -14,7 +14,12 @@ import src
 import glob
 
 class BashError(Exception):
-    pass
+
+    def __init__(self, reason):
+        self.reason = reason
+
+    def explain(self):
+        return "BASH : {}".format(self.reason)
 
 class Daemon(object):
     def __init__(self, pidfile, stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
@@ -140,7 +145,9 @@ class Teacher(Daemon):
                     logging.info("Starting up " + str(self.last_action))
                     self.last_action = datetime.datetime.now()
                     self.teachvw()
-                except Exception as e:
+                except BashError as e:
+                    self.send_email(e.explain())
+                except:
                     self.send_email(traceback.format_exc())
 
     def restart(self, config):
@@ -158,7 +165,7 @@ class Teacher(Daemon):
         a, b = process.communicate()
         if process.returncode != 0:
             logging.fatal(b.strip())
-            raise(BashError)
+            raise(BashError(command))
         logging.info(a.strip())
         self._remove_input()
 
@@ -171,7 +178,7 @@ class Teacher(Daemon):
         a, b = process.communicate()
         if process.returncode != 0:
             logging.fatal(b.strip())
-            raise(BashError)
+            raise(BashError(command))
         logging.info(a.strip())
 
     def _remove_input(self):

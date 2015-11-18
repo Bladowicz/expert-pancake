@@ -147,6 +147,7 @@ class Teacher(Daemon):
                     self.last_action = datetime.datetime.now()
                     self.teachvw()
                 except BashError as e:
+                    logging.fatal(e.explain())
                     self.send_email(e.explain())
                 except:
                     self.send_email(traceback.format_exc())
@@ -165,7 +166,6 @@ class Teacher(Daemon):
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         a, b = process.communicate()
         if process.returncode != 0:
-            logging.fatal(b.strip())
             raise(BashError(command, b.strip()))
         logging.info(a.strip())
         self._remove_input()
@@ -178,7 +178,6 @@ class Teacher(Daemon):
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         a, b = process.communicate()
         if process.returncode != 0:
-            logging.fatal(b.strip())
             raise(BashError(command, b.strip()))
         logging.info(a.strip())
 

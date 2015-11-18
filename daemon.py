@@ -15,11 +15,12 @@ import glob
 
 class BashError(Exception):
 
-    def __init__(self, reason):
-        self.reason = reason
+    def __init__(self, command, err_msg):
+        self.command = command
+        self.err_msg = err_msg
 
     def explain(self):
-        return "BASH : {}".format(self.reason)
+        return "BASH : {}\nERROR : {}".format(self.command, self.err_msg)
 
 class Daemon(object):
     def __init__(self, pidfile, stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
@@ -165,7 +166,7 @@ class Teacher(Daemon):
         a, b = process.communicate()
         if process.returncode != 0:
             logging.fatal(b.strip())
-            raise(BashError(command))
+            raise(BashError(command, b.strip()))
         logging.info(a.strip())
         self._remove_input()
 
@@ -178,7 +179,7 @@ class Teacher(Daemon):
         a, b = process.communicate()
         if process.returncode != 0:
             logging.fatal(b.strip())
-            raise(BashError(command))
+            raise(BashError(command, b.strip()))
         logging.info(a.strip())
 
     def _remove_input(self):

@@ -172,9 +172,8 @@ class Teacher(Daemon):
 
     def _prepare_input(self):
         files = self.get_files()
-        logging.info('\t'.join(files))
-        # raise
-        command = 'cp /home/gbaranowski/test_in {input_file}'.format(input_file=self.input_file)
+        os.chdir("/home/model/home/model/model-class-updater-1.0")
+        command = '/bin/bash run.sh 1 self.input_file {}'.format(" ".join(files))
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         a, b = process.communicate()
         if process.returncode != 0:
@@ -203,18 +202,15 @@ class Teacher(Daemon):
     def get_files(self):
         now = datetime.datetime.now()
         then = now - datetime.timedelta(hours=self.time)
-        logging.info(str(now))
-        logging.info(str(then))
         result = []
         for f in glob.glob("/home/model/y/modelTester.log.*.gz"):
             d = datetime.datetime.strptime(os.path.basename(f), 'modelTester.log.%Y-%m-%d-%H.gz')
-            logging.info("\t".join(map(str, ["a1", d, type(d), type(now), now, d<now, d>now])))
-            logging.info("\t".join(map(str, ["a2", d, type(d), type(then), then, d<then, d>then])))
-
             if d > then and d < now:
                 result.append(f)
         if len(result) == 0:
-            raise(BashError("Files", "None"))
+            raise(BashError("Files", "No files found."))
+        else:
+            logging.info("Files found : {}".format(len(result)))
         return result
 
 

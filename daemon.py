@@ -162,26 +162,24 @@ class Teacher(Daemon):
                                                     output=self.out_file,
                                                     cache_file=self.cache_file,
                                                     params=self.params)
-        # command = 'echo "{}"'.format(command.format(data_file=self.input_file,
-        #                                             output=self.out_file,
-        #                                             cache_file=self.cache_file,
-        #                                             params=self.params))
+        logging.info("Teaching rabbit how to math with : {}".format(command))
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         a, b = process.communicate()
         if process.returncode != 0:
             raise(BashError(command, b.strip()))
-        logging.info(a.strip())
+        logging.info("Rabbit has learned and commented : {}".format(a.strip()))
         self._remove_input()
 
     def _prepare_input(self):
         files = self.get_files()
         os.chdir("/home/model/model-class-updater-1.0")
         command = '/bin/bash run.sh 1 {} {}'.format(self.input_file, " ".join(files))
+        logging.info("Starting file merging with : {}".format(command))
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         a, b = process.communicate()
         if process.returncode != 0:
             raise(BashError(command, b.strip()))
-        logging.info(a.strip())
+        logging.info("Input file prepared with output : {}".format(a.strip()))
 
     def _remove_input(self):
         os.remove(self.input_file)

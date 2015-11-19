@@ -155,7 +155,7 @@ class Teacher(Daemon):
 
     def _wait(self):
         s = (datetime.datetime.now() - self.last_action).seconds
-        if s>0:
+        if s >= 0:
             s = self.min_interval - s
         else:
             s = self.min_interval
@@ -177,13 +177,20 @@ class Teacher(Daemon):
         a, b = process.communicate()
         if process.returncode != 0:
             raise(BashError(command, b.strip()))
-        a = a.strip()
-        if a:
-            logging.info("Rabbit has learned and commented : {}".format(a))
-        b = b.strip()
-        if b:
-            logging.info("Rabbit has learned and nagged : {}".format(b))
+        self._check_answer("Rabbit has learned and commented", a)
+        self._check_answer("Rabbit has learned and nagged", b)
+        # a = a.strip()
+        # if a:
+        #     logging.info("Rabbit has learned and commented : {}".format(a))
+        # b = b.strip()
+        # if b:
+        #     logging.info("Rabbit has learned and nagged : {}".format(b))
         self._remove_input()
+
+    def _check_answer(self, text, msg):
+        msg = msg.strip()
+        if msg:
+            logging.info("{} : {}".format(text, msg))
 
     def _prepare_input(self):
         files = self.get_files()
@@ -194,7 +201,9 @@ class Teacher(Daemon):
         a, b = process.communicate()
         if process.returncode != 0:
             raise(BashError(command, b.strip()))
-        logging.info("Input file prepared with output : {}".format(a.strip()))
+        self._check_answer("Input file prepared with output", a)
+        self._check_answer("Input file prepared with problems", b)
+        # logging.info("Input file prepared with output : {}".format(a.strip()))
 
     def _remove_input(self):
         os.remove(self.input_file)

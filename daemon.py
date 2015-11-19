@@ -140,7 +140,7 @@ class Teacher(Daemon):
 
     def run(self):
         while 1:
-            time.sleep(self.sleep)
+            # time.sleep(self.sleep)
             if (datetime.datetime.now() - self.last_action).seconds > self.min_interval:
                 try:
                     logging.info("########### Starting up after " + str((datetime.datetime.now() - self.last_action).seconds ))
@@ -151,6 +151,12 @@ class Teacher(Daemon):
                     self.send_email(e.explain())
                 except:
                     self.send_email(traceback.format_exc())
+            s = max([(datetime.datetime.now() - self.last_action).seconds, self.sleep])
+            logging.info("I will now sleep for next {}".format(str(datetime.timedelta(seconds=s))))
+            time.sleep(s)
+
+
+
 
     def restart(self, config):
         self.stop()

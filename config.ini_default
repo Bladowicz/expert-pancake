@@ -1,0 +1,18 @@
+[main]
+file_location = /home/gbaranowski/test_files
+min_interval = 10
+sleep_time = 5
+input_file = in_file.gz
+out_file = /home/gbaranowski/model.out
+cache_file = /tmp/vw_mode.cache
+history_length = 12
+
+
+[params]
+params = --loss_function logistic -b 20 --l2 6e-7 --l1 1.2e-7 -l 0.007 --adaptive --invariant --power_t 0.05 --passes 5
+
+[email]
+user = R29sZW0@gmail.com
+pass = ruZDd6jdWBCftJAviELE9qTZ
+sub = VWTeacher
+recipents = grzegorz.baranowski@adpilot.pl

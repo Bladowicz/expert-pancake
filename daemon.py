@@ -68,7 +68,7 @@ class Daemon(object):
         os.remove(self.pidfile)
 
     def start(self):
-
+        logging.info("XXX STARTING XXX")
         try:
             pf = file(self.pidfile, 'r')
             pid = int(pf.read().strip())
@@ -84,7 +84,7 @@ class Daemon(object):
         self.run()
 
     def stop(self):
-
+        logging.info("XXX STOPING XXX")
         try:
             pf = file(self.pidfile, 'r')
             pid = int(pf.read().strip())
@@ -110,7 +110,7 @@ class Daemon(object):
                 sys.exit(1)
 
     def restart(self):
-
+        logging.info("XXX RESTARTING XXX")
         self.stop()
         self.start()
 
@@ -140,10 +140,10 @@ class Teacher(Daemon):
 
     def run(self):
         while 1:
-            # time.sleep(self.sleep)
+
             if (datetime.datetime.now() - self.last_action).seconds > self.min_interval:
                 try:
-                    logging.info("########### Starting up after " + str((datetime.datetime.now() - self.last_action).seconds ))
+                    logging.info("########### STARTING UP ############")
                     self.last_action = datetime.datetime.now()
                     self.teachvw()
                 except BashError as e:
@@ -151,12 +151,16 @@ class Teacher(Daemon):
                     self.send_email(e.explain())
                 except:
                     self.send_email(traceback.format_exc())
-            s = max([(datetime.datetime.now() - self.last_action).seconds, self.sleep])
-            logging.info("I will now sleep for next {}".format(str(datetime.timedelta(seconds=s))))
-            time.sleep(s)
+            self._wait()
 
-
-
+    def _wait(self):
+        s = (datetime.datetime.now() - self.last_action).seconds
+        if s>0:
+            s = self.min_interval - s
+        else:
+            s = self.min_interval
+        logging.info("I will now sleep for next {}".format(str(datetime.timedelta(seconds=s))))
+        time.sleep(s)
 
     def restart(self, config):
         self.stop()
@@ -173,7 +177,12 @@ class Teacher(Daemon):
         a, b = process.communicate()
         if process.returncode != 0:
             raise(BashError(command, b.strip()))
-        logging.info("Rabbit has learned and commented : {}".format(a.strip()))
+        a = a.strip()
+        if a:
+            logging.info("Rabbit has learned and commented : {}".format(a))
+        b = b.strip()
+        if b:
+            logging.info("Rabbit has learned and nagged : {}".format(b))
         self._remove_input()
 
     def _prepare_input(self):

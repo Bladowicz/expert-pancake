@@ -158,14 +158,6 @@ class Teacher(Daemon):
                 logging.info("########### STARTING UP ############")
                 tmp = datetime.datetime.now()
                 self.teachvw()
-
-                # try:
-                #     self.teachvw()
-                # except BashError as e:
-                #     logging.fatal(e.explain())
-                #     self.send_email(e.explain())
-                # except:
-                #     self.send_email(traceback.format_exc())
                 self.last_action = tmp
             self._wait()
 
@@ -193,15 +185,10 @@ class Teacher(Daemon):
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         a, b = process.communicate()
         if process.returncode != 0:
+            logging.fatal('XXXXX')
             raise(BashError(command, b.strip()))
         self._check_answer("Rabbit has learned and commented", a)
         self._check_answer("Rabbit has learned and nagged", b)
-        # a = a.strip()
-        # if a:
-        #     logging.info("Rabbit has learned and commented : {}".format(a))
-        # b = b.strip()
-        # if b:
-        #     logging.info("Rabbit has learned and nagged : {}".format(b))
         self._remove_input()
 
     def _check_answer(self, text, msg):
@@ -210,7 +197,7 @@ class Teacher(Daemon):
             logging.info("{} : {}".format(text, msg))
 
     def _prepare_input(self):
-        files = self.get_files()
+        files = sorted(self.get_files())
         os.chdir("/home/model/model-class-updater-1.0")
         command = '/bin/bash run.sh 1 {} {}'.format(self.input_file, " ".join(files))
         logging.info("Starting file merging with : {}".format(command))
@@ -220,7 +207,6 @@ class Teacher(Daemon):
             raise(BashError(command, b.strip()))
         self._check_answer("Input file prepared with output", a)
         self._check_answer("Input file prepared with problems", b)
-        # logging.info("Input file prepared with output : {}".format(a.strip()))
 
     def _remove_input(self):
         os.remove(self.input_file)

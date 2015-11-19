@@ -13,6 +13,19 @@ import traceback
 import src
 import glob
 
+
+def teachvw_errors(fn):
+    def wrapper(*args, **kargs):
+        try:
+            return fn(*args, **kargs)
+        except BashError as e:
+            logging.fatal(e.explain())
+            args[0].send_email(e.explain())
+        except:
+            args[0].send_email(traceback.format_exc())
+    wrapper.__name__ = fn.__name__
+    return wrapper
+
 class BashError(Exception):
 
     def __init__(self, command, err_msg):
@@ -142,15 +155,18 @@ class Teacher(Daemon):
         while 1:
 
             if (datetime.datetime.now() - self.last_action).seconds > self.min_interval:
-                try:
-                    logging.info("########### STARTING UP ############")
-                    self.last_action = datetime.datetime.now()
-                    self.teachvw()
-                except BashError as e:
-                    logging.fatal(e.explain())
-                    self.send_email(e.explain())
-                except:
-                    self.send_email(traceback.format_exc())
+                logging.info("########### STARTING UP ############")
+                tmp = datetime.datetime.now()
+                self.teachvw()
+
+                # try:
+                #     self.teachvw()
+                # except BashError as e:
+                #     logging.fatal(e.explain())
+                #     self.send_email(e.explain())
+                # except:
+                #     self.send_email(traceback.format_exc())
+                self.last_action = tmp
             self._wait()
 
     def _wait(self):
@@ -166,9 +182,10 @@ class Teacher(Daemon):
         self.stop()
         self.start(config)
 
+    @teachvw_errors
     def teachvw(self):
         self._prepare_input()
-        command = "vw {data_file} -f {output} {params}  --cache_file {cache_file}".format(data_file=self.input_file,
+        command = "vws {data_file} -f {output} {params}  --cache_file {cache_file}".format(data_file=self.input_file,
                                                     output=self.out_file,
                                                     cache_file=self.cache_file,
                                                     params=self.params)

@@ -184,6 +184,7 @@ class Teacher(Daemon):
         logging.info("Teaching rabbit how to math with : {}".format(command))
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         a, b = process.communicate()
+        logging.fatal('ZZZZZ')
         if process.returncode != 0:
             logging.fatal('XXXXX')
             raise(BashError(command, b.strip()))

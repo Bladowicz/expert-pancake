@@ -206,7 +206,7 @@ class Teacher(Daemon):
         now = datetime.datetime.now()
         then = now - datetime.timedelta(hours=self.time)
         result = []
-        for f in glob.glob("/home/model/y/modelTester.log.*.gz"):
+        for f in glob.glob("/home/model/y/modelData.log.*.gz"):
             d = datetime.datetime.strptime(os.path.basename(f), 'modelData.log.%Y-%m-%d-%H.gz')
             if d > then and d < now:
                 result.append(f)

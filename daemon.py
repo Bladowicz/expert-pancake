@@ -122,7 +122,7 @@ class Teacher(Daemon):
     def start(self, config):
         self.config = config
         self.consume_config()
-        self.last_action = datetime.datetime.now()
+        self.last_action = datetime.datetime(1, 1, 1, 0, 0)
         super(Teacher, self).start()
 
     def consume_config(self):
@@ -143,7 +143,7 @@ class Teacher(Daemon):
             time.sleep(self.sleep)
             if (datetime.datetime.now() - self.last_action).seconds > self.min_interval:
                 try:
-                    logging.info("Starting up after " + str((datetime.datetime.now() - self.last_action).seconds ))
+                    logging.info("########### Starting up after " + str((datetime.datetime.now() - self.last_action).seconds ))
                     self.last_action = datetime.datetime.now()
                     self.teachvw()
                 except BashError as e:
